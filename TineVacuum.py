@@ -96,8 +96,12 @@ class TineVacuum (PyTango.LatestDeviceImpl):
     def read_stellung(self, attr):
         self.debug_stream("In read_stellung()")
         #----- PROTECTED REGION ID(TineVacuum.stellung_read) ENABLED START -----#
-        attr.set_value(self.attr_stellung_read)
-        
+
+        try:
+            value = PyTine.get('hasylab/Petra3_P23vil.CDI.SRV/{}'.format(attr.get_name()), 'stellung')['data']
+            attr.set_value(int(value[0]))
+        except:
+            attr.set_value(None)
         #----- PROTECTED REGION END -----#	//	TineVacuum.stellung_read
         
     
@@ -113,10 +117,18 @@ class TineVacuum (PyTango.LatestDeviceImpl):
         self.attr_stellung_read = 0.0
         """
 
-        if self.TineServer != None:
-            devices = PyTine.list('hasylab', self.TineServer, property='stellung')['devices']
+        if self.TineServer is None:
+            self.set_state(PyTango.DevState.FAULT)
+            return
 
-        
+        try:
+            for device in PyTine.list('hasylab', self.TineServer, property='stellung')['devices']:
+                stellung = PyTango.Attr(device, PyTango.DevLong, PyTango.READ)
+                self.add_attribute(stellung, TineVacuum.read_stellung, None, None)
+
+            self.set_state(PyTango.DevState.ON)
+        except:
+            self.set_state(PyTango.DevState.FAULT)
         #----- PROTECTED REGION ID(TineVacuum.initialize_dynamic_attributes) ENABLED START -----#
         
         #----- PROTECTED REGION END -----#	//	TineVacuum.initialize_dynamic_attributes
@@ -134,7 +146,8 @@ class TineVacuum (PyTango.LatestDeviceImpl):
     
 
     #----- PROTECTED REGION ID(TineVacuum.programmer_methods) ENABLED START -----#
-    
+    def read_attribute(self):
+        pass
     #----- PROTECTED REGION END -----#	//	TineVacuum.programmer_methods
 
 class TineVacuumClass(PyTango.DeviceClass):
