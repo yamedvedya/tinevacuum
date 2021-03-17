@@ -98,7 +98,7 @@ class TineVacuum (PyTango.LatestDeviceImpl):
         #----- PROTECTED REGION ID(TineVacuum.stellung_read) ENABLED START -----#
 
         try:
-            value = PyTine.get('hasylab/Petra3_P23vil.CDI.SRV/{}'.format(attr.get_name()), 'stellung')['data']
+            value = PyTine.get('hasylab/{}/{}'.format(self.TineServer, attr.get_name()), 'stellung')['data']
             attr.set_value(int(value[0]))
         except:
             attr.set_value(None)
