@@ -108,14 +108,10 @@ class TineVacuum (PyTango.LatestDeviceImpl):
         #   Copy inside the folowing protected area to instanciate at startup.
         
         """   For Attribute stellung
-        mystellung = PyTango.Attr('Mystellung', PyTango.DevDouble, PyTango.READ)
+        mystellung = PyTango.Attr('Mystellung', PyTango.DevLong, PyTango.READ)
         self.add_attribute(mystellung,TineVacuum.read_stellung, None, None)
-        self.attr_stellung_read = 0.0
+        self.attr_stellung_read = 0
         """
-
-        if self.TineServer != None:
-            devices = PyTine.list('hasylab', self.TineServer, property='stellung')['devices']
-
         
         #----- PROTECTED REGION ID(TineVacuum.initialize_dynamic_attributes) ENABLED START -----#
         
@@ -171,7 +167,7 @@ class TineVacuumClass(PyTango.DeviceClass):
     device_property_list = {
         'TineServer':
             [PyTango.DevString, 
-             '',
+            "the TINE device server address, e.g. ``Petra3_P23vil.CDI.SRV``",
             [] ],
         }
 
